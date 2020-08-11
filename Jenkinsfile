@@ -19,7 +19,7 @@ pipeline {
               steps {
                   withAWS(region:'us-west-2',credentials:'drp_training') {
                   sh 'echo "Uploading content with AWS creds"'
-                      s3Upload(pathStyleAccessEnabled: true, payloadSigningEnabled: true, file:'index.html', bucket:'static-jenkins-pipeline')
+                      s3Upload(pathStyleAccessEnabled: true, payloadSigningEnabled: true, file:'index.html', bucket:'devesco-devops-jenkins')
                   }
               }
          }
