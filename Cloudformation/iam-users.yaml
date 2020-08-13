@@ -1,0 +1,88 @@
+Description: |
+  DeVesco Pierre
+  Create IAM Groups & Policies needed for Jenkins Pipelines on AWS project
+Parameters:
+  SecurityPolicyName:
+    Description: IAM Policy name 
+    Type: String
+    Default: Minimum_Security_Model
+  NewGroupName:
+    Description: Name of the AWS Group that is being created
+    Type: String
+  NewUserName:
+    Description: Name of the AWS User that is being created
+    Type: String
+  InitialPassword:
+    Description: The initial password that the user will use to log in i
+    Type: String
+
+Resources:
+# Creating IAM Policy
+# This Policy only allows access to EC2, Cloudwatch, and S3 Resources
+  # JenkinsPolicy:
+  #   Type: AWS::IAM::Policy
+  #   Properties:
+  #     PolicyName: !Ref SecurityPolicyName
+  #     PolicyDocument:
+  #       Version: 2012-10-17
+  #       Statement:
+  #         -
+  #           Effect: Allow
+  #           Action:
+  #             - 's3:*'
+  #             - 'cloudwatch:*'
+  #             - 'ec2:*'
+  #           Resource: '*'
+# End IAM Policy
+# Creating a Jenkins group and user that attaches Jenkins Policy
+  JenkinsGroup:
+    Type: AWS::IAM::Group
+    Properties:
+      GroupName: !Ref NewGroupName
+      ManagedPolicyArns: 
+        - arn:aws:iam::aws:policy/AmazonEC2FullAccess
+        - arn:aws:iam::aws:policy/AmazonVPCFullAccess
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+  # Create jenkins User and give that user the ability to change their own password
+  # To do that we'll assign a temp password and create a Policy to allow them to change it.
+  JenkinsUser:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Ref NewUserName
+      Groups:
+        - !Ref JenkinsGroup
+      LoginProfile: 
+        Password: !Ref InitialPassword
+        PasswordResetRequired: True
+      Policies:
+        - PolicyName: AccessToChangePassword
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              -
+                Effect: Allow
+                Action: iam:GetAccountPasswordPolicy
+                Resource: '*'
+              -
+                Effect: Allow
+                Action: iam:ChangePassword
+                Resource: !Join [ '', ['arn:aws:iam::*:user/', !Ref NewUserName] ]
+  # Create an Access Key of jenkins user.
+  AccessKey:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      Status: Active
+      UserName: !Ref JenkinsUser
+
+Outputs:
+# Export the Access Keys since they are shown only once.
+  JenkinsAccessKey: 
+    Description: Users secerte Access Key that is generated once
+    Value: !GetAtt AccessKey.SecretAccessKey
+    Export:
+      Name: Jenkins-SecretAccessKey
+  JenkinsAccessId:
+    Description: Users Access Key Id 
+    Value: !Ref AccessKey
+    Export:
+      Name: Jenkins-Access-key-Id

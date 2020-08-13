@@ -1,0 +1,18 @@
+[
+    {
+        "ParameterKey":"SecurityPolicyName",
+        "ParameterValue":"Minimum_Security_Model"
+    },
+    {
+        "ParameterKey":"NewGroupName",
+        "ParameterValue":"jenkins"
+    },
+    {
+        "ParameterKey":"NewUserName",
+        "ParameterValue":"jenkins"
+    },
+    {
+        "ParameterKey":"InitialPassword",
+        "ParameterValue":"aoiDVNeOa093"
+    }
+]
