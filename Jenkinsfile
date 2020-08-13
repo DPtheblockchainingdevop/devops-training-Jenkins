@@ -14,5 +14,10 @@ pipeline {
         }
       }
     }
+    stage('Verify Content') {
+      steps{
+        sh 'curl http://udacity-jenkins-s3-project.s3-website-us-west-2.amazonaws.com/'
+      }
+    }
   }
 }
