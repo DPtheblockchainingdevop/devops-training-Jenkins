@@ -1,6 +1,6 @@
 Description: |
   DeVesco Pierre
-  Create EC2 Instance to run Jenkins server
+  Create S3 bucket for the Jenkins Final Project
 Parameters:
   EnvironmentName:
     Description: An environment name that will be prefixed to resource names
@@ -52,7 +52,7 @@ Resources:
     Type: AWS::S3::Bucket
     DeletionPolicy: Delete
     Properties: 
-      BucketName: udagram-jenkins-s3-project
+      BucketName: udacity-jenkins-s3-project
       PublicAccessBlockConfiguration:
         BlockPublicAcls: FALSE
         BlockPublicPolicy: FALSE
@@ -71,8 +71,9 @@ Resources:
           Sid: PublicReadGetObject
           Effect: Allow
           Principal: '*'
-          Action: s3:GetObject
-          Resource: !Join [ '', ['arn:aws:s3:::', !Ref JenkinsS3Bucket] ]
+          Action: 
+            - s3:GetObject
+          Resource: !Join [ '', [!GetAtt JenkinsS3Bucket.Arn,'/*' ] ]
 
 Outputs:
   S3URL: 
